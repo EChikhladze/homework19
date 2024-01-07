@@ -1,5 +1,6 @@
 package com.example.homework18.presentation.usersList
 
+import android.util.Log.d
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -8,9 +9,9 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.homework18.data.Resource
-import com.example.homework18.data.User
+import com.example.homework18.data.common.Resource
 import com.example.homework18.databinding.FragmentUsersListBinding
+import com.example.homework18.domain.UserDetailsResponse
 import com.example.homework18.presentation.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -22,15 +23,17 @@ class UsersListFragment :
     private lateinit var usersListAdapter: UsersRecyclerAdapter
 
     override fun setUp() {
+        viewModel.getUsersList()
     }
 
-    private fun setRecycler(data: List<User>) {
+    private fun setRecycler(data: List<UserDetailsResponse>) {
         with(binding.recyclerUsers) {
             layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
             setHasFixedSize(true)
             usersListAdapter = UsersRecyclerAdapter(
                 data
             ) { id ->
+                d("lambda", id.toString())
                 val action =
                     UsersListFragmentDirections.actionUsersListFragmentToUserDetailsFragment(id)
                 findNavController().navigate(action)
@@ -43,6 +46,7 @@ class UsersListFragment :
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.responseFlow.collect {
+                    d("userslistfragment", it.toString())
                     when (it) {
                         is Resource.Success -> {
                             setRecycler(it.data)
@@ -54,6 +58,7 @@ class UsersListFragment :
                                 "error: ${it.errorMessage}",
                                 Toast.LENGTH_SHORT
                             ).show()
+                            d("error", it.errorMessage)
                         }
 
                         is Resource.Loading -> {}

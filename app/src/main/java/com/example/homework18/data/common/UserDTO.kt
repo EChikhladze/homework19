@@ -1,8 +1,8 @@
-package com.example.homework18.data
+package com.example.homework18.data.common
 
 import com.squareup.moshi.Json
 
-data class User(
+data class UserDTO(
     @Json(name = "id") val id: Int,
     @Json(name = "email") val email: String,
     @Json(name = "first_name") val firstName: String,

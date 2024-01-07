@@ -1,4 +1,4 @@
-package com.example.homework18.data
+package com.example.homework18.data.common
 
 sealed class Resource<D> {
     data class Success<D>(val data: D) : Resource<D>()

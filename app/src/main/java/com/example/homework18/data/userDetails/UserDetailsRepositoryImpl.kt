@@ -1,8 +1,8 @@
 package com.example.homework18.data.userDetails
 
-import com.example.homework18.data.Resource
-import com.example.homework18.data.User
+import com.example.homework18.data.common.Resource
 import com.example.homework18.domain.UserDetailsRepository
+import com.example.homework18.domain.UserDetailsResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
@@ -11,13 +11,18 @@ import javax.inject.Inject
 
 class UserDetailsRepositoryImpl @Inject constructor(private val userDetailsService: UserDetailsService) :
     UserDetailsRepository {
-    override suspend fun userDetails(id: Int): Flow<Resource<User>> {
+    override suspend fun userDetails(id: Int): Flow<Resource<UserDetailsResponse>> {
         return flow {
             emit(Resource.Loading(true))
             try {
                 val response = userDetailsService.getUserDetails(id.toString())
                 if (response.isSuccessful) {
-                    emit(Resource.Success(response.body()!!))
+                    val user = response.body()
+                    if (user != null) {
+                        emit(Resource.Success(user.toDomain()))
+                    } else {
+                        emit(Resource.Error("User details not available"))
+                    }
                 } else {
                     emit(Resource.Error(response.message()))
                 }

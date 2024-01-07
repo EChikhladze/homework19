@@ -8,9 +8,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
-import com.example.homework18.data.Resource
-import com.example.homework18.data.User
+import com.example.homework18.data.common.Resource
 import com.example.homework18.databinding.FragmentUserDetailsBinding
+import com.example.homework18.domain.UserDetailsResponse
 import com.example.homework18.presentation.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -22,6 +22,7 @@ class UserDetailsFragment :
     private val args: UserDetailsFragmentArgs by navArgs()
 
     override fun setUp() {
+        d("lambda", args.id.toString())
         viewModel.getUserDetails(args.id)
     }
 
@@ -50,7 +51,7 @@ class UserDetailsFragment :
         }
     }
 
-    private fun displayData(user: User) {
+    private fun displayData(user: UserDetailsResponse) {
         with(binding) {
             tvFirstName.text = user.firstName
             tvLastName.text = user.lastName

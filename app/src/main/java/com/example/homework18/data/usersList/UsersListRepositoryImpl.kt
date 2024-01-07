@@ -1,7 +1,8 @@
 package com.example.homework18.data.usersList
 
-import com.example.homework18.data.Resource
-import com.example.homework18.data.User
+import com.example.homework18.data.common.Resource
+import com.example.homework18.data.common.toDomain
+import com.example.homework18.domain.UserDetailsResponse
 import com.example.homework18.domain.UsersListRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -11,13 +12,18 @@ import javax.inject.Inject
 
 class UsersListRepositoryImpl @Inject constructor(private val usersListService: UsersListService) :
     UsersListRepository {
-    override suspend fun usersList(): Flow<Resource<List<User>>> {
+    override suspend fun usersList(): Flow<Resource<List<UserDetailsResponse>>> {
         return flow {
             emit(Resource.Loading(true))
             try {
                 val response = usersListService.getUsersList()
                 if (response.isSuccessful) {
-                    emit(Resource.Success(response.body()!!))
+                    val users = response.body()
+                    if (users != null) {
+                        emit(Resource.Success(users.map { it.toDomain() }))
+                    } else {
+                        emit(Resource.Error("Users list not available"))
+                    }
                 } else {
                     emit(Resource.Error(response.message()))
                 }
